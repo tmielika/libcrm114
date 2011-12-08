@@ -80,7 +80,7 @@ typedef struct {
 //   complete copies of all of the training data, which is what we
 //   do here.
 //
-//   Block 0 is used for the "augmented index"; here's what an 
+//   Block 0 is used for the "augmented index"; here's what an
 //   augmented index cell looks like.  Block 1 are the feature rows
 //   pointed to by start/len in block 0.
 typedef struct {
@@ -101,8 +101,8 @@ typedef struct {
 // The program/language crm114 uses these too.  When it starts calling
 // this library, these will have to be reintegrated.  Or even better, make
 // these classifier flags disjoint from the language flags.  There's
-// already the issue that CRM114_NOCASE "works" in tokenization, but 
-// doesn't generate case-free tokens.  Also, APPEND, NOMULTILINE, 
+// already the issue that CRM114_NOCASE "works" in tokenization, but
+// doesn't generate case-free tokens.  Also, APPEND, NOMULTILINE,
 // FROMSTART etc. are used in both the engine and the library, and those
 // uses need to not clash.
 

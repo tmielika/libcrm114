@@ -91,9 +91,9 @@ typedef struct
   //   termination conditions for boosting
   float desiredacc; // termination accuracy
   float testfrac;   // ... when tested over this fraction of the examples
-  //  
+  //
   // how many bytes in this DB (init by user, lib updates as db grows)
-  size_t datablock_size;	
+  size_t datablock_size;
   //
   // A "block" is a chunk of memory that classifiers use to store
   // learned data, solutions, etc.  A "class" is a logical set of
