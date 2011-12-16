@@ -34,7 +34,9 @@ includesubdir = $(includedir)/crm114
 
 # Compiler / Linker Options
 
+ifndef CFLAGS
 CFLAGS  = -O3
+endif
 CFLAGS += -fpic -Iinclude -pedantic -std=c99
 CFLAGS += -Wall -Wextra -Wpointer-arith -Wstrict-prototypes
 CFLAGS += -Wno-sign-compare -Wno-overlength-strings
