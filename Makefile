@@ -87,4 +87,4 @@ lib/%.o: lib/%.c $(LIBHDRS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 test/%.t: test/%.c $(TESTHDRS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
