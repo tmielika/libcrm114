@@ -223,39 +223,39 @@ int main (void)
 #endif
 
 
-  //    *** OPTIONAL *** Here's how to read and write the datablocks as 
+  //    *** OPTIONAL *** Here's how to read and write the datablocks as
   //    ASCII text files.  This is NOT recommended for storage (it's ~5x bigger
-  //    than the actual datablock, and takes longer to read in as well, 
+  //    than the actual datablock, and takes longer to read in as well,
   //    but rather as a way to debug datablocks, or move a db in a portable fashion
-  //    between 32- and 64-bit machines and between Linux and Windows.  
+  //    between 32- and 64-bit machines and between Linux and Windows.
   //
-  //    ********* CAUTION *********** It is NOT yet implemented 
+  //    ********* CAUTION *********** It is NOT yet implemented
   //    for all classifiers (only Markov/OSB, SVM, PCA, Hyperspace, FSCM, and
   //    Bit Entropy so far.  It is NOT implemented yet for neural net, OSBF,
   //    Winnow, or correlation, but those haven't been ported over yet anyway).
-  //  
+  //
 
 #define READ_WRITE_TEXT
 #ifdef READ_WRITE_TEXT
   printf (" Writing our datablock as 'simple_demo_datablock.txt'.\n");
   crm114_db_write_text (p_db, "simple_demo_datablock.txt");
-  
+
   //  printf (" Freeing the old datablock memory space\n");
 
   printf ("Zeroing old datablock!  Address was %ld\n", (unsigned long) p_db);
-  { 
+  {
     int i;
     for (i = 0; i < p_db->cb.datablock_size; i++)
       ((char *)p_db)[i] = 0;
   }
-  
+
   //  free (p_db);
 
   printf (" Reading the text form back in.\n");
   p_db = crm114_db_read_text ("simple_demo_datablock.txt");
   printf ("Created new datablock.  Datablock address is now %ld\n", (unsigned long) p_db);
 
-  
+
 
 #if TIMECHECK
   times ((void *) &end_time);
@@ -265,8 +265,8 @@ int main (void)
      end_val.tv_sec - start_val.tv_sec + (0.000001 * (end_val.tv_usec - start_val.tv_usec)),
      (end_time.tms_utime - start_time.tms_utime) / (1.000 * sysconf (_SC_CLK_TCK)),
      (end_time.tms_stime - start_time.tms_stime) / (1.000 * sysconf (_SC_CLK_TCK)));
-#endif 
-#endif 
+#endif
+#endif
 
 
 

@@ -664,6 +664,8 @@ static void delete_constraint(int todel, Matrix *A, Matrix *Q, Matrix *R,
 
   if (QP_DEBUG_MODE >= QP_CONSTRAINTS) {
     fprintf(stderr, "Before deleting row %d\n", todel);
+    fprintf(stderr, "A = \n");
+    crm114__matr_print(A);
     fprintf(stderr, "Q = \n");
     crm114__matr_print(Q);
     fprintf(stderr, "R = \n");

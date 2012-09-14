@@ -1,4 +1,4 @@
-#  Makefile for CRM114 library
+# Makefile for CRM114 library
 #
 # Copyright 2010 Kurt Hackenberg & William S. Yerazunis, each individually
 # with full rights to relicense.
@@ -18,124 +18,73 @@
 #   You should have received a copy of the GNU Lesser General Public License
 #   along with the CRM114 Library.  If not, see <http://www.gnu.org/licenses/>.
 
+# GNU Standard Installation Variables
 
-#C flags below are for GCC 4.3.2.
+INSTALL      = install
+INSTALL_DATA = $(INSTALL) -m 644
+INSTALL_DIR  = $(INSTALL) -d
 
+prefix     = /usr/local
+includedir = $(prefix)/include
+libdir	   = $(prefix)/lib
 
-#Use one of the following sets of options for generating code, debug
-#information, and profiling information.
+# CRM114 Installation Directories
 
-#GCC flags: no debugging, optimize, inline matrix library
-#Defining DO_INLINES turns on use of a GCC extension in the matrix library,
-#so don't turn it on for other compilers.
-#CFLAGS += -O3 -DDO_INLINES
-#
-#GCC flags for debugging, no optimization
-CFLAGS += -g
-#
-#GCC and LD flags for debugging, no optimization, and profile for speed
-#CFLAGS += -g -pg
-#LDFLAGS += -pg
-#
-#GCC and LD flags for debugging, no optimization, and profile for coverage
-#CFLAGS += -g -fprofile-arcs -ftest-coverage
-#LDFLAGS += -fprofile-arcs -ftest-coverage
+includesubdir = $(includedir)/crm114
 
-CFLAGS += -Iinclude -fpic
+# Compiler / Linker Options
 
-#always use this: C99, and check source code carefully
-CFLAGS += -std=c99 -pedantic -Wall -Wextra -Wpointer-arith -Wstrict-prototypes
-#well, pretty carefully
+ifndef CFLAGS
+CFLAGS  = -O3
+endif
+CFLAGS += -fpic -Iinclude -pedantic -std=c99
+CFLAGS += -Wall -Wextra -Wpointer-arith -Wstrict-prototypes
 CFLAGS += -Wno-sign-compare -Wno-overlength-strings
 
-#These are optional.
+LDFLAGS += -Llib -lcrm114 -lm -ltre
 
-#warn about any type conversion that could possibly change a value
-#CFLAGS += -Wconversion
-#warn about variable-length arrays, which Microsoft C (C89 w/ ext) can't handle
-#CFLAGS += -Wvla
-#warn about undefined macro in #if value
-#CFLAGS += -Wundef
-#warn about structures marked packed that had no padding anyway
-#CFLAGS += -Wpacked
-#tell us when padding a structure
-#CFLAGS += -Wpadded
-#tell us when denying an inline request
-#CFLAGS += -Winline
+# Source / Target Files
 
-LIBHDR_FILES =					\
-crm114_lib.h					\
-crm114_sysincludes.h				\
-crm114_config.h					\
-crm114_structs.h				\
-crm114_internal.h				\
-crm114_regex.h					\
-crm114_svm.h					\
-crm114_svm_lib_fncts.h				\
-crm114_pca.h					\
-crm114_pca_lib_fncts.h				\
-crm114_matrix.h					\
-crm114_matrix_util.h				\
-crm114_svm_quad_prog.h				\
-crm114_datalib.h
+LIBNAME = libcrm114.a
+LIB     = lib/$(LIBNAME)
+LIBHDRS = $(wildcard include/*.h)
+LIBSRCS = $(wildcard lib/*.c)
+LIBOBJS = $(patsubst %.c,%.o,$(LIBSRCS))
 
-LIBHDRS = $(foreach hdr, $(LIBHDR_FILES), include/$(hdr))
+TESTHDRS = $(wildcard test/*.h)
+TESTSRCS = $(wildcard test/*.c)
+TESTTGTS = $(patsubst %.c,%.t,$(TESTSRCS))
 
-LIBOBJ_FILES =					\
-crm114_base.o					\
-crm114_markov.o					\
-crm114_markov_microgroom.o			\
-crm114_bit_entropy.o				\
-crm114_hyperspace.o				\
-crm114_svm.o					\
-crm114_svm_lib_fncts.o				\
-crm114_svm_quad_prog.o				\
-crm114_fast_substring_compression.o		\
-crm114_pca.o					\
-crm114_pca_lib_fncts.o				\
-crm114_matrix.o					\
-crm114_matrix_util.o				\
-crm114_datalib.o				\
-crm114_vector_tokenize.o			\
-crm114_strnhash.o				\
-crm114_util.o					\
-crm114_regex_tre.o
+.PHONY:	all clean lib lib-clean test test-clean install uninstall
 
-LIBOBJS = $(foreach obj, $(LIBOBJ_FILES), lib/$(obj))
+all:	lib test
 
-SO_NAME = libcrm114.so
-SO_VERSION = 1
-LIB_NAME = $(SO_NAME).$(SO_VERSION)
-LIB = lib/$(SO_NAME)
-LIBLD_PATH = $(abspath lib)
+clean:	lib-clean test-clean
 
-all: $(LIB) tests/test tests/simple_demo
+lib:	$(LIB)
 
-$(LIBOBJS): $(LIBHDRS) Makefile
+lib-clean:
+	rm -f $(LIB) $(LIBOBJS)
 
-$(LIB) lib/$(LIB_NAME): $(LIBOBJS) Makefile
-	$(CC) -shared -Wl,-soname,$(LIB_NAME) -o lib/$(LIB_NAME) $(LIBOBJS)
-	ln -sf $(LIB_NAME) $(LIB)
+test:	$(TESTTGTS)
 
-lib/%.o: lib/%.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+test-clean:
+	rm -f $(TESTTGTS)
 
-tests/test: tests/test.c tests/texts.h $(LIBHDRS)
-	$(CC) $(CFLAGS) -o $@ $(LDFLAGS) -Wl,-rpath,$(LIBLD_PATH) $< -L $(LIBLD_PATH) -lcrm114 -ldl -ltre -lm
+install: lib
+	$(INSTALL_DIR) $(DESTDIR)$(includesubdir)
+	$(INSTALL_DATA) $(LIBHDRS) $(DESTDIR)$(includesubdir)
+	$(INSTALL_DATA) $(LIB) $(DESTDIR)$(libdir)/$(LIBNAME)
 
-tests/simple_demo: tests/simple_demo.c tests/texts.h
-	$(CC) $(CFLAGS) -o $@ $(LDFLAGS) -Wl,-rpath,$(LIBLD_PATH) $< -L $(LIBLD_PATH) -lcrm114 -ldl -ltre -lm
+uninstall:
+	rm -rf $(DESTDIR)$(includesubdir)
+	rm -f  $(DESTDIR)$(libdir)/$(LIBNAME)
 
-clean: clean_test clean_simple_demo clean_lib clean_profiling
+$(LIB): $(LIBOBJS)
+	$(AR) -rs $@ $(LIBOBJS)
 
-clean_test:
-	rm -f tests/test tests/test.map tests/test.o
+lib/%.o: lib/%.c $(LIBHDRS)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-clean_simple_demo:
-	rm -f tests/simple_demo tests/simple_demo.map tests/simple_demo.o {,tests/}simple_demo_datablock.txt
-
-clean_lib:
-	rm -f $(LIB) $(LIBOBJS) lib/$(LIB_NAME)
-
-clean_profiling:
-	rm -f gmon.out *.gcov {,lib/}*.gcno {,lib/}*.gcda
+test/%.t: test/%.c $(TESTHDRS)
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)

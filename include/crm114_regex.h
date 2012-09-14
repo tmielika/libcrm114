@@ -18,12 +18,7 @@
 
 #include <tre/tre.h>
 
-
-extern int crm114__regncomp(regex_t *preg, const char *regex, long regex_len,
-			    int cflags);
-extern int crm114__regnexec(const regex_t *preg, const char *string,
-			    long string_len, size_t nmatch, regmatch_t pmatch[],
-			    int eflags);
-extern size_t crm114__regerror(int errcode, const regex_t *preg, char *errbuf,
-			       size_t errbuf_size);
+extern int crm114__regncomp(regex_t *preg, const char *regex, long regex_len, int cflags);
+extern int crm114__regnexec(const regex_t *preg, const char *string, long string_len, size_t nmatch, regmatch_t pmatch[], int eflags);
+extern size_t crm114__regerror(int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size);
 extern void crm114__regfree(regex_t *preg);

@@ -1,6 +1,6 @@
 
 		HOW TO USE LIBCRM114
- 
+
        (c) Copyright William S. Yerazunis 2010
 
 
@@ -13,7 +13,7 @@ to the CRM114 classifiers.
   - Call them from any program that can call C routines.
   - Use the "learn" function to learn examples into classifiers
   - Use the "classify" function to classify unknown texts.
-  - Save the classifiers as machine-specific binary, or as 
+  - Save the classifiers as machine-specific binary, or as
     machine-independent ASCII.
 
 * What you won't be able to do:
@@ -46,8 +46,8 @@ Now that we're clear on that, let's begin.
 
 
  You might not even need to read this document at all.  Instead,
- go look at the file simple_demo.c and use _that_ code as an 
- example of how to use libcrm114.  
+ go look at the file simple_demo.c and use _that_ code as an
+ example of how to use libcrm114.
 
 
 
@@ -64,11 +64,11 @@ These are the only data structures you need to know about:
 
    2) Control Blocks (cb): These are structures that describe the general
                 setup of a classifier.  Each classifier is described by
-		one control block.  With few exceptions, you 
+		one control block.  With few exceptions, you
                 need never access their slots directly; routines
                 are supplied that do all the dirty stuff for you
 		(and incidentally keep you from making a mess).
-		Control blocks are fixed length.  
+		Control blocks are fixed length.
 
 	        Important: Control blocks contain all of the setup
                 configuration of a classifier, but never any actual
@@ -78,11 +78,11 @@ These are the only data structures you need to know about:
                 created from a control block (cb).  The db does
 		contain learning information; you don't need to know
 		the internal format at all (although you might be able
-		to figure it out by looking at the ASCII dumps and 
+		to figure it out by looking at the ASCII dumps and
 		reading the code. )
 
                 A db (it's sorta-kinda a database, so don't feel that
-		you think of database when you hear "db") can get 
+		you think of database when you hear "db") can get
 		pretty big - and can change size or starting address
 		so be sure to follow the idioms as stated below
 		or segfaults will await you.
@@ -90,13 +90,13 @@ These are the only data structures you need to know about:
                 In particular, a db might need to grow, so instead
                 of the library doing a Possibly Bad Thing (like overwriting
 	        memory) instead on each LEARN call the library will
-                return you a pointer to the new db.  This might 
+                return you a pointer to the new db.  This might
                 be newly malloced, or it might be identical to the
-                pointer to the db before the learn. 
+                pointer to the db before the learn.
 
    4) Result blocks: This is what you get back when you do a CLASSIFY
       	        of an unknown text.  You can either look at it with
-		your own code, or print it out to stdout with the supplied 
+		your own code, or print it out to stdout with the supplied
 		pretty-printer.
 
    5) Error states: these are integers, but we declare them as a type.
@@ -132,7 +132,7 @@ Here's the calling sequence:
      p_cb = crm114_new_cb();
 
 However, you'll still need to create a control block; to do
-this, use crm114_new_cb () like this.  Don't forget to 
+this, use crm114_new_cb () like this.  Don't forget to
 check that you actually were able to make the allocation:
 
   printf (" Creating a CB (control block) \n");
@@ -177,13 +177,13 @@ flags into the cb with crm114_cb_setflags(), with the calling
 sequence:
 
              crm114_cb_setflags (CRM114_controlblock *p_cb,
-	     			long classifier_flags)  ;   
+	     			long classifier_flags)  ;
 
 
-which uses a 64-bit LONG for classifier flags (currently, at least.  
-This may need to be changed sometime in the distant future).  
+which uses a 64-bit LONG for classifier flags (currently, at least.
+This may need to be changed sometime in the distant future).
 
-Be sure to check the result of crm114_cb_setflags() 
+Be sure to check the result of crm114_cb_setflags()
 to be sure no error occurred.  Here's sample code:
 
   printf (" Setting the classifier flags and style. \n");
@@ -195,7 +195,7 @@ to be sure no error occurred.  Here's sample code:
 
 
 Once you set the classifier, you should do a crm114_cb_setclassdefaults()
-to set the classifier defaults appropriate to that classifier. 
+to set the classifier defaults appropriate to that classifier.
 This step, although optional, is HIGHLY recommended to make sure
 the cb contains "reasonable" settings for the classifier you chose.
 
@@ -211,14 +211,14 @@ part of the intended method of operation.
    *** Choose your regex ***
 
 Next, choose your regex (or take the default).  The default regex
-is [[:graph:]]+ which basically takes whitespace-delimited 
+is [[:graph:]]+ which basically takes whitespace-delimited
 strings as tokens.  Note that some classifiers don't tokenize
 (bit entropy and FSCM don't).  The maximum regex length is 4096
 characters without a recompile.
 
 The calling sequence is:
 
-    err = crm114_cb_set_regex (CRM114_CONTROLBLOCK *p_cb,
+    err = crm114_cb_setregex (CRM114_CONTROLBLOCK *p_cb,
     	  		      char *regex_txt,
 			      int regex_len)
 
@@ -240,9 +240,9 @@ sample usage:
       exit(0);
     };
 
-Note that the (perhaps slightly deceptively named) CRM114_STRING 
+Note that the (perhaps slightly deceptively named) CRM114_STRING
 modifier will change both the regex and the tokenization matrix
-pipeline (see the next item) in one fell swoop.  
+pipeline (see the next item) in one fell swoop.
 
 
    *** Choose your tokenization pipeline matrix ***
@@ -288,7 +288,7 @@ nice properties:
     superhash feature result than "Bar" then "Foo".
 
 Each row in the pipeline matrix generates one super-hash feature, so
-if have four rows in the pipeline matrix, you will get four features 
+if have four rows in the pipeline matrix, you will get four features
 per word in the incoming text.  You may have at most 64 (actually,
 UNIFIED_ITERS_MAX; changeable with recompile) rows in the pipeline matrix.
 
@@ -296,7 +296,7 @@ Rather than setting the pipeline directly, use the call
 crm114_cb_setpipeline() to set the pipeline parameters.
 Note that you must supply four arguments: a pointer to the
 cb, the number of words in succession to consider, the number
-of rows in the pipeline, and finally, the pipeline matrix 
+of rows in the pipeline, and finally, the pipeline matrix
 itself.  The calling sequence is:
 
           err = crm114_cb_set_pipeline (
@@ -324,8 +324,8 @@ For example:
 
 Set the total number of classes you want to partition into.  This
 can be up to 128 classes for most of the classifiers (but sadly, only
-2 for SVM or PCA currently - hopefully this will be relaxed in a 
-future release).  
+2 for SVM or PCA currently - hopefully this will be relaxed in a
+future release).
 
 Note that classes are numbered from 0, so class numbers go 0 to 127.
 
@@ -356,12 +356,12 @@ call should be created and will be, in a future release):
    *** Set the Success/Fail membership of the classes ***
 
 Each class not only has a number, and a name, but a success/fail
-flag.  The success/fail flag is used to make binary decisions more 
+flag.  The success/fail flag is used to make binary decisions more
 convenient; the results of the classify are summarized in terms of
 all of the success classes versus all of the failure classes (yes,
 you also get individual class details, see below).
 
-The default is that the first class (class 0) is a "success" 
+The default is that the first class (class 0) is a "success"
 class, and classes 1 and up are "failure" classes, but you can
 change this easily.  You can write this directly:
 
@@ -374,8 +374,8 @@ change this easily.  You can write this directly:
 
    ***  Set the total amount of starting memory of the classifier ***
 
-7) If you want to change the total amount of memory in use by the 
-classifiers, you can set the desired total size of the final 
+7) If you want to change the total amount of memory in use by the
+classifiers, you can set the desired total size of the final
 classifier db.  This is written directly:
 
   printf (" Setting our desired space to a total of 8 megabytes \n");
@@ -387,7 +387,7 @@ classifier db.  This is written directly:
 
 Finally, let CRM114 set up the rest of the internal configuration
 by calling crm114_cb_setblockdefaults(), and create the new, empty
-db according to this cb with crm114_new_db().  
+db according to this cb with crm114_new_db().
 
             crm114_cb_setblockdefaults (CRM_CONTROLBLOCK *p_cb);
 
@@ -398,11 +398,11 @@ usable (hopefully non-segfaulting) db.
 
 Note also that requests you make that cannot be honored will be
 overwritten with more reasonable values (i.e. ones that won't cause
-an instant segfault).  If it's really important that your values be 
-used as written, please check them in the cb after calling 
+an instant segfault).  If it's really important that your values be
+used as written, please check them in the cb after calling
 crm114_cb_setblockdefaults().  Changing certain values after you call
 crm114_cb_setblockdefaults may lead to delayed segfaults or
-mysterious program corruption and your lack of warranty will 
+mysterious program corruption and your lack of warranty will
 apply twice as strongly.
 
   printf (" Set up the CB internal state for this configuration \n");
@@ -435,10 +435,10 @@ and here's example code:
 Now you have a clean, empty db to learn things into, by calling
 crm114_learn_text().  The calling sequence is:
 
-         err = crm114_learn_text (&CRM114_DATABLOCK *p_db, 
+         err = crm114_learn_text (&CRM114_DATABLOCK *p_db,
       			   int classnum,
 			   char *text,
-			   int textlength);  
+			   int textlength);
 
 Note that we pass a _pointer_ to the _pointer_ to the db.  This is
 because the db may need to be expanded and that's not always possible
@@ -448,7 +448,7 @@ case.  (Additionally, you must not assume that the db will not
 be auto-grown.  For some classifiers, the only alternatives
 are "grow or die").
 
-Here's some example code: 
+Here's some example code:
   printf (" Starting to learn the 'Alice in Wonderland' text\n");
   err = crm114_learn_text(&p_db, 0,
 			  Alice,
@@ -459,7 +459,7 @@ Here's some example code:
 			  Macbeth,
 			  strlen (Macbeth) );
 
-  //    *** OPTIONAL ***  if you want to learn a third class (class #2) 
+  //    *** OPTIONAL ***  if you want to learn a third class (class #2)
   printf (" Starting to learn the 'Hound of the Baskervilles' text\n");
   err = crm114_learn_text(&p_db, 2,
   			  Hound,
@@ -470,18 +470,18 @@ Note that you can always see the current size of the db; it's in:
 
     p_db->datablock_size
 
-and is always the actual length in bytes of the db.  
+and is always the actual length in bytes of the db.
 
 
   ***  Saving and Restoring the db onto disk ***
 
 First, the easy way: the db is just a binary block of memory; you
-can write it to a file in the usual-for-your-operating system 
-ways: 
+can write it to a file in the usual-for-your-operating system
+ways:
 
-   fopen / fwrite / fclose,   then   fopen  / fread / fclose 
+   fopen / fwrite / fclose,   then   fopen  / fread / fclose
 
-or 
+or
 
    open / write / close,      then   open / read / close
 
@@ -492,12 +492,12 @@ to restore the db.  For example:
    FILE *myfile;
    myfile = fopen ("/home/me/my_db_file.crm", "wb");
    if (!myfile) { printf ("Couldn't open\n"); exit };
-   fwrite (p_db, 1, p_db->datablock_size, myfile);
+   fwrite (p_db, 1, p_db->cb->datablock_size, myfile);
    fclose (myfile);
 
 and the corresponding code for reading the db back in.
 
-(NB: we really ought to have this packaged as a nice call, as 
+(NB: we really ought to have this packaged as a nice call, as
    crm114_db_write_binary() and crm114_db_read_binary().  But
    that's for the future. )
 
@@ -510,42 +510,42 @@ inside.  Although there may be some human-readable parts, by and
 large it's utterly incomprehensible.
 
 However, there's a way to convert this huge binary blob into
-ASCII text and back to binary: crm114_db_write_text() and 
+ASCII text and back to binary: crm114_db_write_text() and
 crm114_db_read_text().  Here's the calling sequence, both for
-files, and for fp's (i.e. those FILE * things you may have 
+files, and for fp's (i.e. those FILE * things you may have
 declared):
 
-    err = crm114_db_write_text (CRM114_DATABLOCK *p_db, 
+    err = crm114_db_write_text (CRM114_DATABLOCK *p_db,
     	  		       	char *filename);
 
-    err = crm114_db_write_text_fp (CRM114_DATABLOCK *p_db, 
+    err = crm114_db_write_text_fp (CRM114_DATABLOCK *p_db,
     	  		       	FILE *fp);
 
     CRM114_DATABLOCK *new_db = crm114_db_read_text (char *filename);
 
     CRM114_DATABLOCK *new_db = crm114_db_read_text_fp (FILE *fp);
-		 
+
 
 Of course, using any of these on an embedded system that doesn't
 have a filesystem may lead you into difficulties.
 
-  //    *** OPTIONAL *** Here's how to read and write the datablocks as 
+  //    *** OPTIONAL *** Here's how to read and write the datablocks as
   //    ASCII text files.  This is NOT recommended for storage (it's ~5x bigger
-  //    than the actual datablock, and takes longer to read in as well, 
+  //    than the actual datablock, and takes longer to read in as well,
   //    but rather as a way to debug datablocks, or move a db portably
-  //    between 32- and 64-bit machines and between Linux and Windows.  
+  //    between 32- and 64-bit machines and between Linux and Windows.
 
   //
-  //    ********* CAUTION *********** It is NOT yet implemented 
+  //    ********* CAUTION *********** It is NOT yet implemented
   //    for all classifiers (only Markov/OSB, SVM, PCA, Hyperspace, FSCM, and
   //    Bit Entropy so far.  It is NOT implemented yet for neural net, OSBF,
   //    Winnow, or correlation, but those haven't been ported over yet anyway).
-  //  
+  //
 
 
   printf (" Writing our datablock as 'simple_demo_datablock.txt'.\n");
   crm114_db_write_text (p_db, "simple_demo_datablock.txt");
-  
+
   printf (" Freeing the old datablock memory space\n");
   free (p_db);
 
@@ -565,32 +565,32 @@ The calling sequence is:
          err = crm114_classify_text (CRM114_DATABLOCK p_db,
 	       			    char *text,
 				    int text_len
-				    CRM114_RESULT *result);
+				    CRM114_MATCHRESULT *result);
 
 Note that the full results of the classification are returned in
-the result block.  
+the result block.
 
 The header of the result block contains an oversimplified summary
 of the results.  These are:
 
 	result->tsprob       // the total probability of all "success" classes.
-	result->overall_pr       // the total pR of all "success" classes.
+	result->overall_pR       // the total pR of all "success" classes.
 	result->bestmatch_index  // the best single class match
 
 You also get a summary of the text being classified:
 
 	result->unk_features     // how many features did the unknown have?
-        
+
 ... and of the classifier itself:
 
         result->classifier_flags   // the flags used
 	result->how_many_classes   // how many classes in the classifier
-        
+
 
 The result block also gives you the per-class particulars, such
 as the classname, the individual pR and probability, the number
 of documents trained into that class, the number of features in
-that class, how many "hits" the unknown document got versus the 
+that class, how many "hits" the unknown document got versus the
 training, whether the class is a member of the "success" group
 or the "fail" group, etc:
 
@@ -608,7 +608,7 @@ to standard output (this may be a design oops).  Here's the calling
 sequence for crm114_show_result():
 
       crm114_show_result (char *your_identifying_text_here,
-      			  CRM114_RESULT *result);
+      			  CRM114_MATCHRESULT *result);
 
 
 Here's some example code:
@@ -638,5 +638,5 @@ this with free().  Here's example code:
 Of course, free()ing is entirely optional; your cb and db will
 be freed on exit in any case.
 
-  
+
 

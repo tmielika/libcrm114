@@ -158,10 +158,10 @@ int crm114__hyperspace_learned_write_text_fp(const CRM114_DATABLOCK *db,
 int crm114__hyperspace_learned_read_text_fp(CRM114_DATABLOCK **db, FILE *fp);
 int crm114__markov_learned_write_text_fp(const CRM114_DATABLOCK *db, FILE *fp);
 int crm114__markov_learned_read_text_fp(CRM114_DATABLOCK **db, FILE *fp);
-int crm114__bit_entropy_learned_write_text_fp(const CRM114_DATABLOCK *db, 
+int crm114__bit_entropy_learned_write_text_fp(const CRM114_DATABLOCK *db,
 					      FILE *fp);
 int crm114__bit_entropy_learned_read_text_fp(CRM114_DATABLOCK **db, FILE *fp);
-int crm114__fscm_learned_write_text_fp(const CRM114_DATABLOCK *db, 
+int crm114__fscm_learned_write_text_fp(const CRM114_DATABLOCK *db,
 					      FILE *fp);
 int crm114__fscm_learned_read_text_fp(CRM114_DATABLOCK **db, FILE *fp);
 
