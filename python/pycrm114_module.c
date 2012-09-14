@@ -366,6 +366,48 @@ DB_load(PyObject *type, PyObject *args) {
   return (PyObject *)self;
 }
 
+
+static PyObject *
+DB_dump_binary(DB_Object *self, PyObject *args) {
+  PyObject *fpo;
+  FILE *fp;
+
+  if (!PyArg_ParseTuple(args, "O!", &PyFile_Type, &fpo))
+    return NULL;
+  fp = PyFile_AsFile(fpo);
+  fwrite (self->p_db, 1, self->p_db->cb.datablock_size, fp);
+
+  Py_RETURN_NONE;
+}
+
+static PyObject *
+DB_load_binary(PyObject *type, PyObject *args) {
+  PyObject *fpo;
+  DB_Object *self;
+  FILE *fp;
+  CRM114_DATABLOCK *p_db;
+  int sz;
+
+  if (!PyArg_ParseTuple(args, "O!", &PyFile_Type, &fpo))
+    return NULL;
+  fp = PyFile_AsFile(fpo);
+  fseek(fp, 0L, SEEK_END);
+  sz = ftell(fp);
+  fseek(fp, 0L, SEEK_SET);
+  p_db = malloc(sz);
+  fread(p_db,sizeof(char),sz,fp);
+  if ((ferror(fp))) {
+    PyErr_Format(ErrorObject, "error reading data block");
+    return NULL;
+  }
+  if ((self = (DB_Object *)PyObject_New(DB_Object, &DB_Type)) == NULL)
+    return NULL;
+  self->p_db = (CRM114_DATABLOCK *)p_db;
+  return (PyObject *)self;
+}
+
+
+
 static PyMethodDef DB_methods[] = {
   {"learn_text", (PyCFunction)DB_learn_text, METH_VARARGS,
    "learn some example text into the specified class"},
@@ -375,6 +417,10 @@ static PyMethodDef DB_methods[] = {
    "store data block into a file"},
   {"load", (PyCFunction)DB_load, METH_CLASS | METH_VARARGS,
    "load data block from a file"},
+  {"dump_binary", (PyCFunction)DB_dump_binary, METH_VARARGS,
+   "store data block into a binary file"},
+  {"load_binary", (PyCFunction)DB_load_binary, METH_CLASS | METH_VARARGS,
+   "load data block from a binary file"},
   {NULL}                        /* sentinel          */
 };
 
