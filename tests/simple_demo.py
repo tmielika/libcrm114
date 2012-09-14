@@ -34,7 +34,6 @@ Willows_frag = \
     "brow, and after the seclusion of the cellarage he had lived in so long\n" \
     "the carol of happy birds fell on his dulled hearing almost like a shout."
 
-
 cb = p.ControlBlock(flags=(p.CRM114_SVM | p.CRM114_STRING),
                     classes=[("Alice", True), ("Macbeth", False)],
                     start_mem = 8000000)
