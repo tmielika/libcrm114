@@ -395,8 +395,7 @@ DB_load_binary(PyObject *type, PyObject *args) {
   sz = ftell(fp);
   fseek(fp, 0L, SEEK_SET);
   p_db = malloc(sz);
-  fread(p_db,sizeof(char),sz,fp);
-  if ((ferror(fp))) {
+  if (sz!=fread(p_db,sizeof(char),sz,fp) || ferror(fp)) {
     PyErr_Format(ErrorObject, "error reading data block");
     return NULL;
   }
